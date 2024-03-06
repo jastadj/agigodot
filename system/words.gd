@@ -1,7 +1,7 @@
 class_name Words
 extends Node
 
-static func loadWords(filename:String):
+static func load_words(filename:String):
 	var bytes = FileAccess.get_file_as_bytes(filename)
 	var pos:int = 0
 	var letteroffsets = []
