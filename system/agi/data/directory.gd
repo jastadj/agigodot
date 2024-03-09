@@ -5,7 +5,7 @@ const VOLUME_HEADER_SIZE = 5
 
 enum DIR_TYPE{LOGDIR, PICDIR, VIEWDIR, SNDDIR}
 
-static func load_directory(filename:String, _dirtype:DIR_TYPE, _version:float):
+static func load_directory(filename:String, _version:float):
 	
 	var bytes = FileAccess.get_file_as_bytes(filename)
 	var pos = 0

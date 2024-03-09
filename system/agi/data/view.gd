@@ -102,7 +102,7 @@ static func cel_data_to_pixels(cel:Dictionary, transparency:bool = true):
 	#print("offset: 0x%x" % curview["offset"], " loops:", curview["loops"].size())
 	#print("loop:", loop_list.selected, ", cel:", cel_list.selected, ", w:", curcel["w"], ", h:", curcel["h"], ", t:", curcel["t"] )
 	
-	var transparent_color = System.agi.color[cel["t"]]
+	var transparent_color = System.agi.colors[cel["t"]]
 	if transparency:
 		transparent_color.a = 0
 	
@@ -118,7 +118,7 @@ static func cel_data_to_pixels(cel:Dictionary, transparency:bool = true):
 			if color_index == cel["t"]:
 				color = transparent_color
 			else:
-				color = System.agi.color[color_index]
+				color = System.agi.colors[color_index]
 			
 			cur_x += runlen
 			for run in range(0, runlen):
