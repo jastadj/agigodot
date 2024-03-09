@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://dtffdqcxknt8n"]
+
+[ext_resource type="Script" path="res://scenes/agimain/agimain.gd" id="1_7cfds"]
+
+[node name="agimain" type="Node2D"]
+script = ExtResource("1_7cfds")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
+zoom = Vector2(2, 1)

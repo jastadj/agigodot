@@ -1,6 +1,8 @@
 class_name Directory
 extends Node
 
+const VOLUME_HEADER_SIZE = 5
+
 enum DIR_TYPE{LOGDIR, PICDIR, VIEWDIR, SNDDIR}
 
 static func load_directory(filename:String, dirtype:DIR_TYPE, version:float):
@@ -17,7 +19,9 @@ static func load_directory(filename:String, dirtype:DIR_TYPE, version:float):
 	
 	while pos < bytes.size():
 		var vol:int = (bytes[pos] & 0xf0) >> 4
-		var offset:int = (bytes[pos] & 0x0f << 16) | (bytes[pos+1] << 8) | (bytes[pos+2])
+		var offset:int = ( (bytes[pos] & 0x0f) << 16) | (bytes[pos+1] << 8) | (bytes[pos+2])
+		# add the volume header size to the offset (5 bytes)
+		offset += VOLUME_HEADER_SIZE
 		# [v]ol num, [o]ffset pos, [i]nvalid entry
 		dir.append({"v":vol, "o":offset}) 
 		# if all 3 entry bytes = 0xff, resource does not exist
