@@ -5,13 +5,13 @@ const VOLUME_HEADER_SIZE = 5
 
 enum DIR_TYPE{LOGDIR, PICDIR, VIEWDIR, SNDDIR}
 
-static func load_directory(filename:String, dirtype:DIR_TYPE, version:float):
+static func load_directory(filename:String, _dirtype:DIR_TYPE, _version:float):
 	
 	var bytes = FileAccess.get_file_as_bytes(filename)
 	var pos = 0
 	var offsetcount = 0
 	var dir = []
-	var ifile = FileAccess.open(filename, FileAccess.READ)
+	var _ifile = FileAccess.open(filename, FileAccess.READ)
 	
 	if bytes.is_empty():
 		printerr("Error opening dir file:", filename)
