@@ -25,7 +25,7 @@ static func load_views(viewdir):
 			views.append(null)
 			continue
 		else:
-			views.append({"loops":[], "sequences":[]})
+			views.append({"offset":pos,"loops":[], "sequences":[]})
 		
 		# get volume
 		var vol = System.agi.volumes[res_entry["v"]]
@@ -55,6 +55,8 @@ static func load_views(viewdir):
 		# LOOP
 		for loopoffset in loop_offsets:
 			
+			if views.size() == 1:
+				print("loop offset 0x%x" % loopoffset)
 			# seek to loop offset
 			vol.seek(loopoffset)
 			
@@ -77,8 +79,8 @@ static func load_views(viewdir):
 				var width:int = vol.get_8()
 				var height:int = vol.get_8()
 				var transparency_and_mirror:int = vol.get_8()
-				var transparency:int = (transparency_and_mirror & 0xf0) >> 4
-				var mirroring:int = transparency_and_mirror & 0x0f
+				var transparency:int = transparency_and_mirror & 0x0f
+				var mirroring:int = (transparency_and_mirror & 0xf0) >> 4
 				
 				var cel = {"w":width, "h":height, "t":transparency, "m":mirroring, "d":[]}
 				
@@ -95,4 +97,5 @@ static func load_views(viewdir):
 				loop["cels"].append(cel)
 			
 			views.back()["loops"].append(loop)	
-		
+	
+	return views

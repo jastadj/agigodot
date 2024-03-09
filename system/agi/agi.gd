@@ -14,27 +14,13 @@ var snddir
 const AGI_WIDTH = 320
 const AGI_HEIGHT = 200
 
-var views = {}
+var views = []
 
 func _ready():
 	
 	# init color palette
 	print("Initializing color palette.")
 	_init_colors()
-	
-	# open volumes
-	load_volume("res://testdata/pq1/VOL.0")
-	load_volume("res://testdata/pq1/VOL.1")
-	load_volume("res://testdata/pq1/VOL.2")
-	
-	# load words
-	wordgroups = Words.load_words("res://testdata/pq1/WORDS.TOK")
-	
-	# load directory files
-	viewdir = Directory.load_directory("res://testdata/pq1/VIEWDIR", Directory.DIR_TYPE.VIEWDIR, 2.0)
-		
-	# load resources
-	views = View.load_views(viewdir)	
 
 func _init_colors():
 	color.append(Color.hex(0x000000FF)) # 0 - black
@@ -54,7 +40,7 @@ func _init_colors():
 	color.append(Color.hex(0xFFFF55FF)) #14 - yellow
 	color.append(Color.hex(0xFFFFFFFF)) #15 - white
 
-func load_volume(filename:String):
+func _load_volume(filename:String):
 	
 	var ifile = FileAccess.open(filename, FileAccess.READ)
 	
@@ -64,3 +50,36 @@ func load_volume(filename:String):
 	
 	print("Loaded volume ", filename)
 	volumes.append(ifile)
+
+func load_game_dir(_gamedir:String):
+	
+	# open directory
+	var gamedir = DirAccess.open(_gamedir)
+	if(!gamedir):
+		printerr("Unable to open game directory:", _gamedir)
+		return false
+	var gamedirfiles = gamedir.get_files()
+
+	#######
+	# WORDS
+	var wordsfilename = _gamedir + "/WORDS.TOK"
+	wordgroups = Words.load_words(wordsfilename)
+	
+	#########
+	# VOLUMES
+	print(gamedirfiles)
+	volumes = []
+	var volumefiles = []
+	for gfile in gamedirfiles:
+		if gfile.contains("VOL."):
+			volumefiles.append(_gamedir + "/" + gfile)
+	volumefiles.sort()
+	for vfile in volumefiles:
+		_load_volume(vfile)
+	
+	# load directory files
+	var viewdirfilename = _gamedir + "/VIEWDIR"
+	viewdir = Directory.load_directory(viewdirfilename, Directory.DIR_TYPE.VIEWDIR, 2.0)
+		
+	# load resources
+	views = View.load_views(viewdir)	

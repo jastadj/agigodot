@@ -8,12 +8,13 @@ static func load_words(filename:String):
 	var wordgroups = {}
 	var wordstr = ""
 	var prevword = ""
+	var wordcounter = 0
 	
 	if bytes.is_empty():
 		push_error("Error reading word file: " + filename)
 		return null
 	
-	print("Loaded word file: ",filename,", size: ", bytes.size()," bytes" )
+	#print("Loaded word file: ",filename,", size: ", bytes.size()," bytes" )
 	
 	# read letter offsets (2 bytes per letter, a-z)
 	for i in range(0,26):
@@ -74,10 +75,11 @@ static func load_words(filename:String):
 		#print(wordstr)
 		
 		# next word
+		wordcounter += 1
 		pos += 2
 		
 		
 	#print(wordgroups)
 	#print(wordgroups.keys())
-	print("Successfully loaded word file from ", filename)
+	print("Successfully loaded ", wordcounter, " words in ",wordgroups.keys().size()," word groups from file:", filename)
 	return wordgroups

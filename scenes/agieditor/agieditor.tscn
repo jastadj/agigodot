@@ -1,3 +1,106 @@
-[gd_scene format=3 uid="uid://crjrteng800a8"]
+[gd_scene load_steps=3 format=3 uid="uid://crjrteng800a8"]
+
+[ext_resource type="Script" path="res://scenes/agieditor/agieditor.gd" id="1_lcw7k"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_1kngb"]
 
 [node name="agieditor" type="Node2D"]
+script = ExtResource("1_lcw7k")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ui" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/ui"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 64.0
+offset_right = 199.0
+offset_bottom = 104.0
+
+[node name="ButtonLoadGameDir" type="Button" parent="CanvasLayer/ui/VBoxContainer"]
+layout_mode = 2
+text = "Load Game Dir"
+
+[node name="FileDialogGameDir" type="FileDialog" parent="CanvasLayer/ui"]
+title = "Open a Directory"
+size = Vector2i(500, 500)
+ok_button_text = "Select Current Folder"
+file_mode = 2
+access = 2
+
+[node name="Control" type="Control" parent="CanvasLayer/ui"]
+anchors_preset = 0
+offset_left = 295.0
+offset_top = 47.0
+offset_right = 335.0
+offset_bottom = 87.0
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/ui/Control"]
+layout_mode = 0
+offset_right = 528.0
+offset_bottom = 526.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/ui/Control/PanelContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "View"
+
+[node name="OptionButtonViews" type="OptionButton" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Loop"
+
+[node name="OptionButtonLoop" type="OptionButton" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Cel"
+
+[node name="OptionButtonCel" type="OptionButton" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="ButtonPlayAnimation" type="Button" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+toggle_mode = true
+button_pressed = true
+text = "Play/Pause"
+
+[node name="Label" type="Label" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRectCel" type="TextureRect" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+texture = SubResource("ImageTexture_1kngb")
+stretch_mode = 2
+
+[node name="TimerAnimation" type="Timer" parent="."]
+wait_time = 0.1
+autostart = true
+
+[connection signal="pressed" from="CanvasLayer/ui/VBoxContainer/ButtonLoadGameDir" to="." method="_on_button_load_game_dir_pressed"]
+[connection signal="dir_selected" from="CanvasLayer/ui/FileDialogGameDir" to="." method="_on_file_dialog_game_dir_dir_selected"]
+[connection signal="item_selected" from="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonViews" to="." method="_on_option_button_views_item_selected"]
+[connection signal="item_selected" from="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonLoop" to="." method="_on_option_button_loop_item_selected"]
+[connection signal="item_selected" from="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonCel" to="." method="_on_option_button_cel_item_selected"]
+[connection signal="toggled" from="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer/ButtonPlayAnimation" to="." method="_on_button_play_animation_toggled"]
+[connection signal="timeout" from="TimerAnimation" to="." method="_on_timer_animation_timeout"]
