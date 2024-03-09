@@ -32,19 +32,17 @@ static func load_views(viewdir):
 		
 		# seek to view entry offset in volume
 		vol.seek(pos)
-		
-		
-		
+
 		######
 		# VIEW
 		
 		# view header (7-bytes)
-		var unkbyte1:int = vol.get_8() # always 1 or 2
-		var unkbyte2:int = vol.get_8() # always 1
+		var _unkbyte1:int = vol.get_8() # always 1 or 2
+		var _unkbyte2:int = vol.get_8() # always 1
 		var loopcount:int = vol.get_8()
-		var desc_offset:int = vol.get_8() | (vol.get_8() << 8) # lsms, offset of view description (text description of item)
+		var _desc_offset:int = vol.get_8() | (vol.get_8() << 8) # lsms, offset of view description (text description of item)
 		var loop_offsets = []
-		var loops = []
+		var _loops = []
 		
 		# offsets of each loop (relative to view data pos)
 		for l in range(0, loopcount):
@@ -55,8 +53,6 @@ static func load_views(viewdir):
 		# LOOP
 		for loopoffset in loop_offsets:
 			
-			if views.size() == 1:
-				print("loop offset 0x%x" % loopoffset)
 			# seek to loop offset
 			vol.seek(loopoffset)
 			
@@ -99,3 +95,45 @@ static func load_views(viewdir):
 			views.back()["loops"].append(loop)	
 	
 	return views
+
+static func cel_data_to_pixels(cel:Dictionary, transparency:bool = true):
+	var pixeldata = PackedByteArray()
+	
+	#print("offset: 0x%x" % curview["offset"], " loops:", curview["loops"].size())
+	#print("loop:", loop_list.selected, ", cel:", cel_list.selected, ", w:", curcel["w"], ", h:", curcel["h"], ", t:", curcel["t"] )
+	
+	var transparent_color = System.agi.color[cel["t"]]
+	if transparency:
+		transparent_color.a = 0
+	
+	var cur_x = 0
+	var _line_counter = 0
+	for d in cel["d"]:
+		if d != 0:
+			var runlen = d & 0x0f
+			
+			# pixel color
+			var color_index = (d & 0xf0) >> 4
+			var color
+			if color_index == cel["t"]:
+				color = transparent_color
+			else:
+				color = System.agi.color[color_index]
+			
+			cur_x += runlen
+			for run in range(0, runlen):
+				pixeldata.append(color.r8)
+				pixeldata.append(color.g8)
+				pixeldata.append(color.b8)
+				pixeldata.append(color.a8)
+		if d == 0:
+			var color = transparent_color
+			for run in range(0, cel["w"] - cur_x):
+				pixeldata.append(color.r8)
+				pixeldata.append(color.g8)
+				pixeldata.append(color.b8)
+				pixeldata.append(color.a8)
+			cur_x = 0
+			_line_counter += 1
+		
+	return pixeldata
