@@ -1,8 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://crjrteng800a8"]
+[gd_scene load_steps=2 format=3 uid="uid://crjrteng800a8"]
 
 [ext_resource type="Script" path="res://scenes/agieditor/agieditor.gd" id="1_lcw7k"]
-
-[sub_resource type="ImageTexture" id="ImageTexture_1kngb"]
 
 [node name="agieditor" type="Node2D"]
 script = ExtResource("1_lcw7k")
@@ -77,6 +75,10 @@ text = "Cel"
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 
+[node name="CheckBoxTransparency" type="CheckBox" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Transparency"
+
 [node name="ButtonPlayAnimation" type="Button" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 10
@@ -88,10 +90,13 @@ text = "Play/Pause"
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TextureRectCel" type="TextureRect" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer"]
+[node name="MarginContainerViewSprite" type="MarginContainer" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer"]
 layout_mode = 2
-texture = SubResource("ImageTexture_1kngb")
-stretch_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="Sprite2DView" type="Sprite2D" parent="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/MarginContainerViewSprite"]
+centered = false
 
 [node name="TimerAnimation" type="Timer" parent="."]
 wait_time = 0.1
@@ -102,5 +107,4 @@ autostart = true
 [connection signal="item_selected" from="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonViews" to="." method="_on_option_button_views_item_selected"]
 [connection signal="item_selected" from="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonLoop" to="." method="_on_option_button_loop_item_selected"]
 [connection signal="item_selected" from="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonCel" to="." method="_on_option_button_cel_item_selected"]
-[connection signal="toggled" from="CanvasLayer/ui/Control/PanelContainer/VBoxContainer/HBoxContainer/ButtonPlayAnimation" to="." method="_on_button_play_animation_toggled"]
 [connection signal="timeout" from="TimerAnimation" to="." method="_on_timer_animation_timeout"]
