@@ -1,0 +1,78 @@
+[gd_scene load_steps=2 format=3 uid="uid://bifqdo5mrvyxg"]
+
+[ext_resource type="Script" path="res://scenes/agieditor/view/viewviewer.gd" id="1_0jwg6"]
+
+[node name="ViewViewer" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 295.0
+offset_top = 47.0
+offset_right = 335.0
+offset_bottom = 87.0
+script = ExtResource("1_0jwg6")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_right = 528.0
+offset_bottom = 526.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "View"
+
+[node name="OptionButtonViews" type="OptionButton" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Loop"
+
+[node name="OptionButtonLoop" type="OptionButton" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Cel"
+
+[node name="OptionButtonCel" type="OptionButton" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="CheckBoxTransparency" type="CheckBox" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Transparency"
+
+[node name="ButtonPlayAnimation" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+toggle_mode = true
+button_pressed = true
+text = "Play/Pause"
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainerViewSprite" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="Sprite2DView" type="Sprite2D" parent="PanelContainer/VBoxContainer/MarginContainerViewSprite"]
+centered = false
+
+[node name="TimerAnimation" type="Timer" parent="."]
+wait_time = 0.1
+autostart = true
+
+[connection signal="item_selected" from="PanelContainer/VBoxContainer/HBoxContainer/OptionButtonViews" to="." method="_on_option_button_views_item_selected"]
+[connection signal="item_selected" from="PanelContainer/VBoxContainer/HBoxContainer/OptionButtonLoop" to="." method="_on_option_button_loop_item_selected"]
+[connection signal="item_selected" from="PanelContainer/VBoxContainer/HBoxContainer/OptionButtonCel" to="." method="_on_option_button_cel_item_selected"]
