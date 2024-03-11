@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://crjrteng800a8"]
+[gd_scene load_steps=4 format=3 uid="uid://crjrteng800a8"]
 
 [ext_resource type="Script" path="res://scenes/agieditor/agieditor.gd" id="1_lcw7k"]
 [ext_resource type="PackedScene" uid="uid://bifqdo5mrvyxg" path="res://scenes/agieditor/view/view_viewer.tscn" id="2_5hgi5"]
+[ext_resource type="Script" path="res://scenes/agieditor/picture/picture_viewer.gd" id="3_vgxca"]
 
 [node name="agieditor" type="Node2D"]
 script = ExtResource("1_lcw7k")
@@ -34,7 +35,66 @@ ok_button_text = "Select Current Folder"
 file_mode = 2
 access = 2
 
-[node name="ViewViewer" parent="CanvasLayer/ui" instance=ExtResource("2_5hgi5")]
+[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/ui"]
+layout_mode = 0
+offset_left = 29.0
+offset_top = 82.0
+offset_right = 69.0
+offset_bottom = 122.0
+
+[node name="ButtonView" type="Button" parent="CanvasLayer/ui/VBoxContainer2"]
+layout_mode = 2
+text = "View"
+
+[node name="ButtonPicture" type="Button" parent="CanvasLayer/ui/VBoxContainer2"]
+layout_mode = 2
+text = "Picture"
+
+[node name="Tools" type="Control" parent="CanvasLayer/ui"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 157.0
+offset_top = 83.0
+offset_right = -995.0
+offset_bottom = -565.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ViewViewer" parent="CanvasLayer/ui/Tools" instance=ExtResource("2_5hgi5")]
+visible = false
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+
+[node name="PictureViewer" type="Control" parent="CanvasLayer/ui/Tools"]
+anchors_preset = 0
+script = ExtResource("3_vgxca")
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/ui/Tools/PictureViewer"]
+layout_mode = 0
+offset_right = 759.0
+offset_bottom = 465.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Picture"
+
+[node name="OptionButtonPictures" type="OptionButton" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
 
 [connection signal="pressed" from="CanvasLayer/ui/VBoxContainer/ButtonLoadGameDir" to="." method="_on_button_load_game_dir_pressed"]
 [connection signal="dir_selected" from="CanvasLayer/ui/FileDialogGameDir" to="." method="_on_file_dialog_game_dir_dir_selected"]
+[connection signal="pressed" from="CanvasLayer/ui/VBoxContainer2/ButtonView" to="." method="_on_button_view_pressed"]
+[connection signal="pressed" from="CanvasLayer/ui/VBoxContainer2/ButtonPicture" to="." method="_on_button_picture_pressed"]
+[connection signal="item_selected" from="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonPictures" to="CanvasLayer/ui/Tools/PictureViewer" method="_on_option_button_pictures_item_selected"]

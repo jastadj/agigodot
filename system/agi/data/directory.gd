@@ -32,3 +32,17 @@ static func load_directory(filename:String, _version:float):
 	print("Loaded directory file ", filename, ", entries=", offsetcount)
 	
 	return dir
+
+static func is_entry_valid(d_entry:Dictionary):
+	
+	# if entry doesn't contain the invalid flag, return false
+	if !d_entry.has("i") or !d_entry.has("o") or !d_entry.has("v"):
+		printerr("Directory entry missing dict keys!")
+		return false
+	
+	# if entry is invalid, return false
+	if d_entry["i"]:
+		return false
+		
+	# ok
+	return true

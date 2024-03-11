@@ -9,6 +9,7 @@ offset_left = 295.0
 offset_top = 47.0
 offset_right = 335.0
 offset_bottom = 87.0
+mouse_filter = 2
 script = ExtResource("1_0jwg6")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]

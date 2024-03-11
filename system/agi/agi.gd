@@ -6,14 +6,16 @@ const AGI_HEIGHT = 200
 
 var colors = []
 
-# resources
+# volumes
 var volumes = []
-var logdir
-var viewdir
-var picdir
-var snddir
-var views = []
-var pictures = []
+
+# directory entries
+var logdir = []
+var viewdir = []
+var picdir = []
+var snddir = []
+
+# words
 var wordgroups
 
 
@@ -85,10 +87,8 @@ func load_game_dir(_gamedir:String):
 	# viewdir
 	var viewdirfilename = _gamedir + "/VIEWDIR"
 	viewdir = Directory.load_directory(viewdirfilename, 2.0)
-	views = View.load_views(viewdir)	
 	
 	# picdir
 	var picdirfilename = _gamedir + "/PICDIR"
 	picdir = Directory.load_directory(picdirfilename, 2.0)
-	pictures = Picture.load_pictures(picdir)
 	
