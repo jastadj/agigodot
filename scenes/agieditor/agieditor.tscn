@@ -93,8 +93,17 @@ text = "Picture"
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 
+[node name="CheckBoxPriority" type="CheckBox" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Show Priority Layer"
+
+[node name="TextureRectPicture" type="TextureRect" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+stretch_mode = 2
+
 [connection signal="pressed" from="CanvasLayer/ui/VBoxContainer/ButtonLoadGameDir" to="." method="_on_button_load_game_dir_pressed"]
 [connection signal="dir_selected" from="CanvasLayer/ui/FileDialogGameDir" to="." method="_on_file_dialog_game_dir_dir_selected"]
 [connection signal="pressed" from="CanvasLayer/ui/VBoxContainer2/ButtonView" to="." method="_on_button_view_pressed"]
 [connection signal="pressed" from="CanvasLayer/ui/VBoxContainer2/ButtonPicture" to="." method="_on_button_picture_pressed"]
 [connection signal="item_selected" from="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonPictures" to="CanvasLayer/ui/Tools/PictureViewer" method="_on_option_button_pictures_item_selected"]
+[connection signal="toggled" from="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer/CheckBoxPriority" to="CanvasLayer/ui/Tools/PictureViewer" method="_on_check_box_priority_toggled"]
