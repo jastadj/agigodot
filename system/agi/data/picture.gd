@@ -1,6 +1,12 @@
 class_name Picture
 extends Node
 
+const PICTURE_BG_COLOR = 15
+const PRIORITY_BG_COLOR = 4
+
+var _pos:int = 0
+var _data:PackedByteArray
+
 var _img_picture:Image = null
 var _img_priority:Image = null
 
@@ -32,6 +38,13 @@ enum DRAW_CMD{
 	
 	# ... xFB - 0xF				  # unused in most games
 }
+
+enum PEN_STYLE { SOLID, SPLATTER}
+enum PEN_SHAPE {CIRCLE, RECTANGLE}
+
+var _pen_size:int = 0
+var _pen_style:PEN_STYLE = PEN_STYLE.SOLID
+var _pen_shape:PEN_SHAPE = PEN_SHAPE.RECTANGLE
 
 static func load_picture(picdir_index):
 	
@@ -78,11 +91,26 @@ static func load_picture(picdir_index):
 	print("Loaded picture %d " % picdir_index, "with %d bytes" % picture.size())
 	return picture
 
+func _is_next_eof():
+	return (_pos + 1 >= _data.size())
+
+func _is_next_cmd():
+	if _is_next_eof():
+		return false
+	return (_data[_pos+1] >= 0xf0)
+
+func _get_next():
+	if _is_next_eof():
+		return null
+	_pos += 1
+	return int(_data[_pos])
+		
+
 func get_images_from_picture(picture:PackedByteArray):
-	
-	var pos:int = 0
 
 	# init variables
+	_pos = -1
+	_data = picture
 	_picture_color = System.agi.colors[0]
 	_priority_color = System.agi.colors[0]
 	_draw_picture_enabled = false
@@ -92,119 +120,128 @@ func get_images_from_picture(picture:PackedByteArray):
 	# init images
 	_img_picture = Image.create(AGI.AGI_WIDTH/2, AGI.AGI_HEIGHT, false, Image.FORMAT_RGBA8)
 	_img_priority = Image.create(AGI.AGI_WIDTH/2, AGI.AGI_HEIGHT, false, Image.FORMAT_RGBA8)
-	_img_picture.fill(System.agi.colors[15])
-	_img_priority.fill(System.agi.colors[4])
+	_img_picture.fill(System.agi.colors[PICTURE_BG_COLOR])
+	_img_priority.fill(System.agi.colors[PRIORITY_BG_COLOR])
 	
 	# run picture draw commands
-	while pos < picture.size():
-		print("pos:",pos)
-		var cmd:int = picture[pos] # command byte
-		var argc = 0 # arguments consumed for command, advances iterator
+	while _pos < _data.size():
 		
-		# DRAW COMMANDS
+		# advance position for next command
+		if _is_next_eof():
+			break
+		_get_next()
+		
+		var cmd:int = _data[_pos] # command byte
+		
+		# DRAW ENABLE/DISABLE
 		if cmd == DRAW_CMD.DRAW_COLOR:
-			argc = 1
 			_draw_picture_enabled = true
-			_picture_color = System.agi.colors[picture[pos+1]]
+			_picture_color = System.agi.colors[_get_next()]
 		elif cmd == DRAW_CMD.DISABLE_DRAW:
 			_draw_picture_enabled = false
 		elif cmd == DRAW_CMD.PRIORITY_DRAW_COLOR:
-			argc = 1
 			_draw_priority_enabled = true
-			_priority_color = System.agi.colors[picture[pos+1]]
+			_priority_color = System.agi.colors[_get_next()]
 		elif cmd == DRAW_CMD.DISABLE_PRIORITY_DRAW:
 			_draw_priority_enabled = false
+		
+		# DRAW CORNERS (TURTLE STYLE)
 		elif cmd == DRAW_CMD.DRAW_Y_CORNER or cmd == DRAW_CMD.DRAW_X_CORNER:
-			var draw_corners = true # flag to continue drawinging corners
 			var draw_y:bool = cmd == DRAW_CMD.DRAW_Y_CORNER # start with y or x dir?
-			_draw_pos = Vector2i(picture[pos+1], picture[pos+2])
-			
-			argc = 2
+			_draw_pos = Vector2i(_get_next(), _get_next())
 			
 			# draw lines in alternating axis until a new draw cmd is found (>= 0xf0)
-			while draw_corners:
+			while 1:
 				
-				# end of picture data?
-				if pos + argc + 1 >= picture.size():
-					draw_corners = false
-					continue
-				
-				# new draw command?
-				var byte:int = picture[pos + argc + 1]
-				if byte >= 0xf0: # cmd found, stop drawing
-					draw_corners = false
-					continue
+				# if eof or next cmd
+				if _is_next_eof() or _is_next_cmd():
+					break
 				
 				if draw_y:
-					_draw_line(_draw_pos, Vector2(_draw_pos.x, byte))
+					_draw_line(_draw_pos, Vector2(_draw_pos.x, _get_next()))
 					draw_y = false
 				else:
-					_draw_line(_draw_pos, Vector2(byte, _draw_pos.y))
+					_draw_line(_draw_pos, Vector2(_get_next(), _draw_pos.y))
 					draw_y = true
-				argc += 1	
+		
+		# DRAW ABSOLUTE LINES (x1,y1,x2,y2)
 		elif cmd == DRAW_CMD.DRAW_LINE_ABSOLUTE:
 			var draw_lines:bool = true
-			_draw_pos = Vector2i(picture[pos+1], picture[pos+2])
-			argc += 2
+			_draw_pos = Vector2i(_get_next(), _get_next())
 			
-			while draw_lines:
+			while 1:
 				
-				# end of picture data?
-				if pos + argc + 1 >= picture.size():
-					draw_lines = false
-					continue
-				# new draw command?
-				var byte:int = picture[pos + argc + 1]
-				if byte >= 0xf0:
-					draw_lines = false
-					continue
+				# end of data or end of cmd?
+				if _is_next_eof() or _is_next_cmd():
+					break
 				
 				# draw line to next two bytes (x,y)
-				var pos2 = Vector2i(picture[pos + argc + 1], picture[pos + argc + 2])
+				var pos2 = Vector2i(_get_next(), _get_next())
 				_draw_line(_draw_pos, pos2)
-				argc += 2
+		
+		# draw relative commands (offset from starting position, coords have -7 to 7 range)
 		elif cmd == DRAW_CMD.DRAW_LINE_RELATIVE:
 			var draw_lines:bool = true
-			_draw_pos = Vector2i(picture[pos+1], picture[pos+2])
-			argc += 2
+			_draw_pos = Vector2i(_get_next(), _get_next())
 			
-			while draw_lines:
+			while 1:
 				
-				# end of picture data?
-				if pos + argc + 1 >= picture.size():
-					draw_lines = false
-					continue
-				# new draw command?
-				var byte:int = picture[pos + argc + 1]
-				if byte >= 0xf0:
-					draw_lines = false
-					continue
-					
+				# end of data or end of cmd?
+				if _is_next_eof() or _is_next_cmd():
+					break
+				
 				# get relative line byte info (rel offsets are -7 to 7)
+				var byte:int = _get_next()
 				var rel_x:int = (byte & 0x70) >> 4
 				var rel_y:int = byte & 0x7
 				
 				# apply sign bit
 				if byte & 0x80:
-					rel_x *= -1
+					rel_x = -rel_x
 				if byte & 0x08:
-					rel_y *= -1
+					rel_y = -rel_y
 				
 				
-				argc += 1
-				
+		# FLOOD FILL
 		elif cmd == DRAW_CMD.DRAW_FILL:
-			print("fill")
+			pass
+		
+		
+		# PEN SIZE/STYLE
 		elif cmd == DRAW_CMD.PEN_SIZE_STYLE:
-			print("draw pen size & style")
+			var byte:int = _get_next()
+			
+			# configure pen
+			_pen_style = (byte & 0x20) >> 5
+			_pen_shape = (byte & 0x10) >> 4
+			_pen_size = byte & 0x7
+		
+		# PEN PLOT
 		elif cmd == DRAW_CMD.PEN_PLOT:
-			print("draw pen plot")
+			
+			var draw_pen: = true
+			
+			while 1:
+				
+				# end of data or end of cmd?
+				if _is_next_eof() or _is_next_cmd():
+					break
+				
+				# solid pen style has 2 args (x/y)
+				if _pen_style == PEN_STYLE.SOLID:
+					_draw_pos = Vector2i(_get_next(), _get_next())
+					_draw_pen(_draw_pos)
+					
+				# splatter style has 3 args(x/y/texture)
+				else:
+					var texturenum = _get_next()
+					_draw_pos = Vector2i(_get_next(), _get_next())
+					_draw_pen(_draw_pos, texturenum)
+			
 		else:
 			#printerr("Picture unrecognized draw cmd: 0x%x" % cmd)
 			pass
 		
-		# offset iterator by command and argument count
-		pos += 1 + argc
 	
 	return [_img_picture, _img_priority]
 
@@ -213,7 +250,6 @@ func get_images_from_picture(picture:PackedByteArray):
 func _draw_pixel(pos:Vector2i):
 	
 	if _draw_picture_enabled:
-		print("setting image pixel ", pos.x, ",",pos.y, " to color ", _picture_color)
 		_img_picture.set_pixel(pos.x, pos.y, _picture_color)
 	
 	if _draw_priority_enabled:
@@ -272,4 +308,7 @@ func _draw_line(p1:Vector2i, p2:Vector2i):
 			_draw_pixel(Vector2i(_round(x, addX), _round(y,addY)))
 			y += addY
 		_draw_pixel(Vector2i(p2.x, p2.y))
+
+func _draw_pen(pos:Vector2i, texture_id:int = -1):
 	
+	_draw_pixel(pos)

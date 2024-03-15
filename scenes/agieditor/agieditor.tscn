@@ -50,28 +50,20 @@ text = "View"
 layout_mode = 2
 text = "Picture"
 
-[node name="Tools" type="Control" parent="CanvasLayer/ui"]
+[node name="Tools" type="CenterContainer" parent="CanvasLayer/ui"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 157.0
-offset_top = 83.0
-offset_right = -995.0
-offset_bottom = -565.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = 139.0
+offset_top = 94.0
+offset_right = 139.0
+offset_bottom = 94.0
 mouse_filter = 2
 
 [node name="ViewViewer" parent="CanvasLayer/ui/Tools" instance=ExtResource("2_5hgi5")]
 visible = false
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
+layout_mode = 2
 
 [node name="PictureViewer" type="Control" parent="CanvasLayer/ui/Tools"]
-anchors_preset = 0
+layout_mode = 2
 script = ExtResource("3_vgxca")
 
 [node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/ui/Tools/PictureViewer"]

@@ -4,6 +4,9 @@ extends Node2D
 
 func _ready():
 	
+	# adjust window size (temporarily for testing)
+	get_window().size = Vector2i(1500, 1000)
+	
 	_hide_tools()
 	
 	# testing
