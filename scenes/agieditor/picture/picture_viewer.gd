@@ -14,7 +14,7 @@ var picture_image:Image
 var priority_image:Image
 
 
-var picture_scale:float = 8.0
+var picture_scale:float = 4.0
 
 func _ready():
 	

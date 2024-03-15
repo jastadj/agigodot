@@ -280,21 +280,27 @@ func _draw_line(p1:Vector2i, p2:Vector2i):
 	var addX:float = float(height)
 	var addY:float = float(width)
 	
+	#debug
+	if p1.x != p2.x and p1.y != p2.y:
+		if (p1 - p2).length() > 3:
+			print("found non ortho line")
+	
 	if height != 0:
-		addX = float(width) / float(abs(height))
+		addX = float(width) / abs(height)
 	
 	if width != 0:
-		addY = float(height) / float(abs(width))
+		addY = float(height) / abs(width)
 		
 	if abs(width) > abs(height):
 		y = p1.y
 		if width == 0:
 			addX = 0
 		else:
-			addX = float(width) / float(abs(width))
+			addX = width / abs(width)
 		x = p1.x
 		while x != p2.x:
 			_draw_pixel(Vector2i(_round(x, addX), _round(y, addY)))
+			y += addY
 			x += addX
 		_draw_pixel(Vector2i(p2.x, p2.y))
 	else:
@@ -302,10 +308,11 @@ func _draw_line(p1:Vector2i, p2:Vector2i):
 		if height == 0:
 			addY = 0
 		else:
-			addY = float(height) / float(abs(height))
+			addY = height / abs(height)
 		y = p1.y
 		while y != p2.y:
 			_draw_pixel(Vector2i(_round(x, addX), _round(y,addY)))
+			x += addX
 			y += addY
 		_draw_pixel(Vector2i(p2.x, p2.y))
 
