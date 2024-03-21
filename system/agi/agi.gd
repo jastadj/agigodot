@@ -3,8 +3,14 @@ extends Node
 
 const AGI_WIDTH = 320
 const AGI_HEIGHT = 200
+const AGI_PICTURE_HEIGHT = AGI_HEIGHT - (8*4)
+const AGI_ENCRYPTION_STRING = "Avis Durgan"
 
 var colors = []
+
+# internal
+var vars
+var flags
 
 # volumes
 var volumes = []
@@ -18,6 +24,14 @@ var snddir = []
 # words
 var wordgroups
 
+func _init():
+	
+	# init variables and flags
+	vars = []
+	flags = []
+	for i in range(0, 256):
+		vars.append(int(0))
+		flags.append(bool(false))
 
 
 func _ready():
@@ -92,3 +106,10 @@ func load_game_dir(_gamedir:String):
 	var picdirfilename = _gamedir + "/PICDIR"
 	picdir = Directory.load_directory(picdirfilename, 2.0)
 	
+	# logdir
+	var logdirfilename = _gamedir + "/LOGDIR"
+	logdir = Directory.load_directory(logdirfilename, 2.0)
+	
+	# snddir
+	var snddirfilename = _gamedir + "/SNDDIR"
+	snddir = Directory.load_directory(snddirfilename, 2.0)

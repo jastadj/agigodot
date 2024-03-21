@@ -1,6 +1,8 @@
 extends Node2D
 
-@onready var view_viewer = $CanvasLayer/ui/Tools/ViewViewer
+@onready var view_viewer = $CanvasLayer/ui/Tools/view_viewer
+@onready var picture_viewer = $CanvasLayer/ui/Tools/picture_viewer
+@onready var logic_viewer = $CanvasLayer/ui/Tools/logic_viewer
 
 func _ready():
 	
@@ -25,8 +27,12 @@ func _hide_tools():
 
 func _on_button_view_pressed():
 	_hide_tools()
-	$CanvasLayer/ui/Tools/ViewViewer.show()
+	view_viewer.show()
 
 func _on_button_picture_pressed():
 	_hide_tools()
-	$CanvasLayer/ui/Tools/PictureViewer.show()
+	picture_viewer.show()
+
+func _on_button_logic_pressed():
+	_hide_tools()
+	logic_viewer.show()

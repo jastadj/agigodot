@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://crjrteng800a8"]
+[gd_scene load_steps=5 format=3 uid="uid://crjrteng800a8"]
 
 [ext_resource type="Script" path="res://scenes/agieditor/agieditor.gd" id="1_lcw7k"]
 [ext_resource type="PackedScene" uid="uid://bifqdo5mrvyxg" path="res://scenes/agieditor/view/view_viewer.tscn" id="2_5hgi5"]
-[ext_resource type="Script" path="res://scenes/agieditor/picture/picture_viewer.gd" id="3_vgxca"]
+[ext_resource type="PackedScene" uid="uid://c7x1li6aoclli" path="res://scenes/agieditor/picture/picture_viewer.tscn" id="3_2moiq"]
+[ext_resource type="Script" path="res://scenes/agieditor/logic/logic_viewer.gd" id="4_2db2n"]
 
 [node name="agieditor" type="Node2D"]
 script = ExtResource("1_lcw7k")
@@ -50,6 +51,10 @@ text = "View"
 layout_mode = 2
 text = "Picture"
 
+[node name="ButtonLogic" type="Button" parent="CanvasLayer/ui/VBoxContainer2"]
+layout_mode = 2
+text = "Logic"
+
 [node name="Tools" type="CenterContainer" parent="CanvasLayer/ui"]
 layout_mode = 1
 offset_left = 139.0
@@ -58,44 +63,40 @@ offset_right = 139.0
 offset_bottom = 94.0
 mouse_filter = 2
 
-[node name="ViewViewer" parent="CanvasLayer/ui/Tools" instance=ExtResource("2_5hgi5")]
+[node name="view_viewer" parent="CanvasLayer/ui/Tools" instance=ExtResource("2_5hgi5")]
 visible = false
 layout_mode = 2
 
-[node name="PictureViewer" type="Control" parent="CanvasLayer/ui/Tools"]
+[node name="picture_viewer" parent="CanvasLayer/ui/Tools" instance=ExtResource("3_2moiq")]
+visible = false
 layout_mode = 2
-script = ExtResource("3_vgxca")
 
-[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/ui/Tools/PictureViewer"]
+[node name="logic_viewer" type="Control" parent="CanvasLayer/ui/Tools"]
+layout_mode = 2
+script = ExtResource("4_2db2n")
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/ui/Tools/logic_viewer"]
 layout_mode = 0
-offset_right = 759.0
-offset_bottom = 465.0
+offset_right = 669.0
+offset_bottom = 441.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/ui/Tools/logic_viewer/PanelContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ui/Tools/logic_viewer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/ui/Tools/logic_viewer/PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-text = "Picture"
+text = "Logic:"
 
-[node name="OptionButtonPictures" type="OptionButton" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="OptionButtonLogicList" type="OptionButton" parent="CanvasLayer/ui/Tools/logic_viewer/PanelContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
-
-[node name="CheckBoxPriority" type="CheckBox" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Show Priority Layer"
-
-[node name="TextureRectPicture" type="TextureRect" parent="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer"]
-layout_mode = 2
-stretch_mode = 2
 
 [connection signal="pressed" from="CanvasLayer/ui/VBoxContainer/ButtonLoadGameDir" to="." method="_on_button_load_game_dir_pressed"]
 [connection signal="dir_selected" from="CanvasLayer/ui/FileDialogGameDir" to="." method="_on_file_dialog_game_dir_dir_selected"]
 [connection signal="pressed" from="CanvasLayer/ui/VBoxContainer2/ButtonView" to="." method="_on_button_view_pressed"]
 [connection signal="pressed" from="CanvasLayer/ui/VBoxContainer2/ButtonPicture" to="." method="_on_button_picture_pressed"]
-[connection signal="item_selected" from="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonPictures" to="CanvasLayer/ui/Tools/PictureViewer" method="_on_option_button_pictures_item_selected"]
-[connection signal="toggled" from="CanvasLayer/ui/Tools/PictureViewer/PanelContainer/VBoxContainer/HBoxContainer/CheckBoxPriority" to="CanvasLayer/ui/Tools/PictureViewer" method="_on_check_box_priority_toggled"]
+[connection signal="pressed" from="CanvasLayer/ui/VBoxContainer2/ButtonLogic" to="." method="_on_button_logic_pressed"]
+[connection signal="item_selected" from="CanvasLayer/ui/Tools/logic_viewer/PanelContainer/VBoxContainer/HBoxContainer/OptionButtonLogicList" to="CanvasLayer/ui/Tools/logic_viewer" method="_on_option_button_logic_list_item_selected"]

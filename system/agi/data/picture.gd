@@ -1,8 +1,8 @@
 class_name Picture
 extends Node
 
-const PICTURE_BG_COLOR = 15
-const PRIORITY_BG_COLOR = 4
+var _picture_bg_color = System.agi.colors[15]
+var _priority_bg_color = System.agi.colors[4]
 
 var _pos:int = 0
 var _data:PackedByteArray
@@ -118,10 +118,10 @@ func get_images_from_picture(picture:PackedByteArray):
 	_draw_pos = Vector2i(0,0)
 	
 	# init images
-	_img_picture = Image.create(AGI.AGI_WIDTH/2, AGI.AGI_HEIGHT, false, Image.FORMAT_RGBA8)
-	_img_priority = Image.create(AGI.AGI_WIDTH/2, AGI.AGI_HEIGHT, false, Image.FORMAT_RGBA8)
-	_img_picture.fill(System.agi.colors[PICTURE_BG_COLOR])
-	_img_priority.fill(System.agi.colors[PRIORITY_BG_COLOR])
+	_img_picture = Image.create(AGI.AGI_WIDTH/2, AGI.AGI_PICTURE_HEIGHT, false, Image.FORMAT_RGBA8)
+	_img_priority = Image.create(AGI.AGI_WIDTH/2, AGI.AGI_PICTURE_HEIGHT, false, Image.FORMAT_RGBA8)
+	_img_picture.fill(_picture_bg_color)
+	_img_priority.fill(_priority_bg_color)
 	
 	# run picture draw commands
 	while _pos < _data.size():
@@ -204,9 +204,91 @@ func get_images_from_picture(picture:PackedByteArray):
 				
 		# FLOOD FILL
 		elif cmd == DRAW_CMD.DRAW_FILL:
-			pass
-		
-		
+						
+			while 1:
+				
+				# end of data or end of cmd?
+				if _is_next_eof() or _is_next_cmd():
+					break
+				
+				var ffpos = Vector2i(_get_next(), _get_next())
+				var tgt_image = _img_picture
+				
+				# draw modes disabled?  why do a flood fill...
+				if !_draw_picture_enabled and !_draw_priority_enabled:
+					continue
+				
+				# trying to floodfill on a non-bg pixel? do nothing
+				if _draw_picture_enabled:
+					if !_is_pixel_color(ffpos, _img_picture, _picture_bg_color):
+						continue
+				else:
+					if !_is_pixel_color(ffpos, _img_priority, _priority_bg_color):
+						continue
+				
+				# start the flood fill queue
+				var ffqueue = [ffpos]
+				
+				# flood fill
+				while !ffqueue.is_empty():
+					
+					# pop and set pixel from queue
+					var fpos = ffqueue.pop_front()
+					_draw_pixel(fpos)
+					
+					#################
+					# check adjacents
+					
+					if _draw_picture_enabled:
+						# left
+						var lpos = fpos + Vector2i(-1,0)
+						if _is_pixel_color(lpos, _img_picture, _picture_bg_color):
+							_draw_pixel(lpos)
+							ffqueue.append(lpos)
+						
+						# right
+						var rpos = fpos + Vector2i(1,0)
+						if _is_pixel_color(rpos, _img_picture, _picture_bg_color):
+							_draw_pixel(rpos)
+							ffqueue.append(rpos)
+						
+						# up
+						var upos = fpos + Vector2i(0,-1)
+						if _is_pixel_color(upos, _img_picture, _picture_bg_color):
+							_draw_pixel(upos)
+							ffqueue.append(upos)
+							
+						# down
+						var dpos = fpos + Vector2i(0,1)
+						if _is_pixel_color(dpos, _img_picture, _picture_bg_color):
+							_draw_pixel(dpos)
+							ffqueue.append(dpos)
+					else:
+						# left
+						var lpos = fpos + Vector2i(-1,0)
+						if _is_pixel_color(lpos, _img_priority, _priority_bg_color):
+							_draw_pixel(lpos)
+							ffqueue.append(lpos)
+						
+						# right
+						var rpos = fpos + Vector2i(1,0)
+						if _is_pixel_color(rpos, _img_priority, _priority_bg_color):
+							_draw_pixel(rpos)
+							ffqueue.append(rpos)
+						
+						# up
+						var upos = fpos + Vector2i(0,-1)
+						if _is_pixel_color(upos, _img_priority, _priority_bg_color):
+							_draw_pixel(upos)
+							ffqueue.append(upos)
+							
+						# down
+						var dpos = fpos + Vector2i(0,1)
+						if _is_pixel_color(dpos, _img_priority, _priority_bg_color):
+							_draw_pixel(dpos)
+							ffqueue.append(dpos)
+						
+				
 		# PEN SIZE/STYLE
 		elif cmd == DRAW_CMD.PEN_SIZE_STYLE:
 			var byte:int = _get_next()
@@ -245,14 +327,24 @@ func get_images_from_picture(picture:PackedByteArray):
 	
 	return [_img_picture, _img_priority]
 
+func _is_pixel_color(pos:Vector2i, img:Image, color: Color):
+	if pos.x < 0 or pos.x >= img.get_width() or pos.y < 0 or pos.y >= img.get_height():
+		return false
+	return (img.get_pixel(pos.x, pos.y) == color)
+
 # draws a pixel at current draw_pos & current color
 # applied to both priority and picture images (if enabled)
-func _draw_pixel(pos:Vector2i):
+func _draw_pixel(pos:Vector2i, force_picture = null, force_priority = null):
 	
-	if _draw_picture_enabled:
+	if force_picture == null:
+		force_picture = _draw_picture_enabled
+	if force_priority == null:
+		force_priority = _draw_priority_enabled
+	
+	if force_picture:
 		_img_picture.set_pixel(pos.x, pos.y, _picture_color)
 	
-	if _draw_priority_enabled:
+	if force_priority:
 		_img_priority.set_pixel(pos.x, pos.y, _priority_color)
 		
 	# set the current draw position here
@@ -280,23 +372,18 @@ func _draw_line(p1:Vector2i, p2:Vector2i):
 	var addX:float = float(height)
 	var addY:float = float(width)
 	
-	#debug
-	if p1.x != p2.x and p1.y != p2.y:
-		if (p1 - p2).length() > 3:
-			print("found non ortho line")
-	
 	if height != 0:
-		addX = float(width) / abs(height)
+		addX = float(width) / float(abs(height))
 	
 	if width != 0:
-		addY = float(height) / abs(width)
+		addY = float(height) / float(abs(width))
 		
 	if abs(width) > abs(height):
 		y = p1.y
 		if width == 0:
 			addX = 0
 		else:
-			addX = width / abs(width)
+			addX = float(width) / float(abs(width))
 		x = p1.x
 		while x != p2.x:
 			_draw_pixel(Vector2i(_round(x, addX), _round(y, addY)))
@@ -308,7 +395,7 @@ func _draw_line(p1:Vector2i, p2:Vector2i):
 		if height == 0:
 			addY = 0
 		else:
-			addY = height / abs(height)
+			addY = float(height) / float(abs(height))
 		y = p1.y
 		while y != p2.y:
 			_draw_pixel(Vector2i(_round(x, addX), _round(y,addY)))
@@ -318,4 +405,19 @@ func _draw_line(p1:Vector2i, p2:Vector2i):
 
 func _draw_pen(pos:Vector2i, texture_id:int = -1):
 	
-	_draw_pixel(pos)
+	var pwidth = _pen_size + 1
+	var pheight = (_pen_size * 2) + 1
+	var offset:Vector2i
+	
+	# if pen size is 0, its a 1x1 pixel
+	if _pen_size == 0:
+		pheight = 1
+	
+	# set the brush offset
+	offset.x = floor(pwidth/2)
+	offset.y = floor(pheight/2)
+	
+	if _pen_shape == PEN_SHAPE.RECTANGLE:
+		if _pen_style == PEN_STYLE.SOLID:
+			pass
+	
