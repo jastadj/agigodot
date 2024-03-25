@@ -29,15 +29,40 @@ static func load_logic(logdir_index):
 	vol.seek(pos)
 	
 	# Logic Header
-	var text_offset:int = (vol.get_8() & (vol.get_8() << 8)) + 5
+	var text_offset:int = (vol.get_8() | (vol.get_8() << 8)) + 7
 	var script_data = PackedByteArray()
-	
-	print("logic text offset:", text_offset, ", pos:", pos)
-	
-	# read script data (until start of text offset)
+
+	pos += 2
+
 	while pos < text_offset:
-		print(pos)
 		script_data.append(vol.get_8())
 		pos += 1
+
+	print("logic data size:", script_data.size(), " bytes")
 	
-	print("Loaded ", script_data.size(), " bytes for logic ", logdir_index)
+	# Logic Strings
+	var encrypt_len = AGI.AGI_ENCRYPTION_STRING.length()
+	var logic_strings = []
+	var logic_string_offsets = []
+	var logic_strings_count:int = vol.get_8()
+	pos += 1
+	var logic_strings_end_ptr:int = (vol.get_8() | (vol.get_8() << 8)) + pos
+	
+	# collect the offsets
+	for i in range(0, logic_strings_count):
+		logic_string_offsets.append( (vol.get_8() | (vol.get_8() << 8)) + pos) 
+	
+	# read logic strings
+	vol.seek(logic_string_offsets[0])
+	var logicstring:String
+	for offset in range(logic_string_offsets[0], logic_strings_end_ptr):
+		var index = offset - logic_string_offsets[0]
+		var schar:int = vol.get_8() ^ (AGI.AGI_ENCRYPTION_STRING[index % encrypt_len].to_ascii_buffer()[0])
+		logicstring += char(schar)
+		if schar == 0:
+			logic_strings.append(logicstring)
+			logicstring = String()
+	
+	for lstring in logic_strings:
+		print(lstring)
+	print("stored string count = ", logic_strings.size(), ", expected string count = ", logic_strings_count)
